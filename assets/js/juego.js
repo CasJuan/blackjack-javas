@@ -19,6 +19,7 @@ const btnDetener = document.querySelector("#btnDetener");
 const btnNuevo = document.querySelector("#btnNuevo");
 
 const puntosHTML = document.querySelectorAll('small');
+
 const divCartasJugador = document.querySelector('#jugador-carta');
 const divCartasComputadora = document.querySelector('#computadora-carta');
 
@@ -54,7 +55,6 @@ const pedirCarta = () => {
     return carta;
 }
 
-pedirCarta();
 
 const valorCarta = (carta) => {
     
@@ -77,6 +77,7 @@ const turnoComputadora = (puntosMinimos) => {
     do {
         
         const carta = pedirCarta();
+
         puntosComputadora = puntosComputadora + valorCarta(carta);
         puntosHTML[1].innerHTML = puntosComputadora;
 
@@ -101,7 +102,7 @@ const turnoComputadora = (puntosMinimos) => {
         }else{
             alert('Computadora gana 🖥️');
         }
-    },10)
+    },100)
 
 }
 
@@ -126,6 +127,7 @@ btnPedir.addEventListener('click' ,  () => {
         console.warn('Ganaste');
         btnPedir.disabled = true;
         btnDetener.disabled = true;
+        turnoComputadora(puntosJugador);
     }
 });
 
