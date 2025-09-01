@@ -5,157 +5,163 @@ h = corazon
 s = picas
 */ 
 
+(() => {
+    
+    'use strict'
 
-let deck = [];
-const tipos = ['C','D','H','S'];
-const especiales = ['A','J','Q','K'];
+    let deck = [];
+    const tipos = ['C','D','H','S'];
+    const especiales = ['A','J','Q','K'];
 
-let puntosJugador = 0;
-let puntosComputadora = 0;
+    let puntosJugador = 0;
+    let puntosComputadora = 0;
 
-//Referencias
-const btnPedir = document.querySelector("#btnPedir");
-const btnDetener = document.querySelector("#btnDetener");
-const btnNuevo = document.querySelector("#btnNuevo");
+    //Referencias
+    const btnPedir = document.querySelector("#btnPedir");
+    const btnDetener = document.querySelector("#btnDetener");
+    const btnNuevo = document.querySelector("#btnNuevo");
 
-const puntosHTML = document.querySelectorAll('small');
+    const puntosHTML = document.querySelectorAll('small');
 
-const divCartasJugador = document.querySelector('#jugador-carta');
-const divCartasComputadora = document.querySelector('#computadora-carta');
+    const divCartasJugador = document.querySelector('#jugador-carta');
+    const divCartasComputadora = document.querySelector('#computadora-carta');
 
-//Esta funcion crea un nuevo deck
-const crearDeck = () => {
+    //Esta funcion crea un nuevo deck
+    const crearDeck = () => {
 
-    for(let i = 2; i <= 10; i++){
-        for (let tipo of tipos) {
-            deck.push(i + tipo)
+        for(let i = 2; i <= 10; i++){
+            for (let tipo of tipos) {
+                deck.push(i + tipo)
+            }
         }
-    }
 
-    for(let tipo of tipos){
-        for (let esp of especiales) {
-            deck.push(esp + tipo)
+        for(let tipo of tipos){
+            for (let esp of especiales) {
+                deck.push(esp + tipo)
+            }
         }
+
+        deck = _.shuffle(deck);
+        return deck;
+
     }
 
-    deck = _.shuffle(deck);
-    return deck;
+    crearDeck();
 
-}
+    //Esta funcion me permite pedir una carta
+    const pedirCarta = () => {
+        if (deck.length === 0){
+            throw 'No hay cargas en el deck';
+        }
 
-crearDeck();
-
-//Esta funcion me permite pedir una carta
-const pedirCarta = () => {
-    if (deck.length === 0){
-        throw 'No hay cargas en el deck';
+        const carta = deck.pop();
+        return carta;
     }
 
-    const carta = deck.pop();
-    return carta;
-}
+
+    const valorCarta = (carta) => {
+
+        const valor = carta.substring(0,carta.length-1);
+
+        return ( isNaN(valor) ) ? 
+                (valor === 'A') ? 11 : 10
+                : valor * 1;
+
+                /* let puntos = 0;
+        if( isNaN(valor)){
+             puntos = (valor === 'A') ? 11 : 10;
+        }else{
+            puntos = valor * 1;
+        } */
+    }
+
+    //Turno de la computadora
+    const turnoComputadora = (puntosMinimos) => {
+        do {
+
+            const carta = pedirCarta();
+
+            puntosComputadora = puntosComputadora + valorCarta(carta);
+            puntosHTML[1].innerHTML = puntosComputadora;
+
+            const imgCarta = document.createElement('img');
+            imgCarta.src = `assets/cartas/cartas/${carta}.png`;
+            imgCarta.classList.add('carta');
+            divCartasComputadora.append(imgCarta);
+
+            if(puntosMinimos > 21){
+                break;
+            }
+
+        } while ((puntosComputadora < puntosMinimos) && (puntosMinimos <= 21));
+
+        setTimeout(() => {
+            if(puntosComputadora === puntosMinimos){
+                alert('Empate 😊')
+            } else if (puntosMinimos > 21) {
+                alert ('Computadora gana 🖥️')
+            }else if (puntosComputadora > 21){
+                alert('Jugadora Gana👌')
+            }else{
+                alert('Computadora gana 🖥️');
+            }
+        },100)
+
+    }
 
 
-const valorCarta = (carta) => {
-    
-    const valor = carta.substring(0,carta.length-1);
-    
-    return ( isNaN(valor) ) ? 
-            (valor === 'A') ? 11 : 10
-            : valor * 1;
-    
-            /* let puntos = 0;
-    if( isNaN(valor)){
-         puntos = (valor === 'A') ? 11 : 10;
-    }else{
-        puntos = valor * 1;
-    } */
-}
-
-//Turno de la computadora
-const turnoComputadora = (puntosMinimos) => {
-    do {
-        
+    //Eventos
+    btnPedir.addEventListener('click' ,  () => {
         const carta = pedirCarta();
-
-        puntosComputadora = puntosComputadora + valorCarta(carta);
-        puntosHTML[1].innerHTML = puntosComputadora;
+        puntosJugador = puntosJugador + valorCarta(carta);
+        puntosHTML[0].innerHTML = puntosJugador;
 
         const imgCarta = document.createElement('img');
         imgCarta.src = `assets/cartas/cartas/${carta}.png`;
         imgCarta.classList.add('carta');
-        divCartasComputadora.append(imgCarta);
+        divCartasJugador.append(imgCarta);
 
-        if(puntosMinimos > 21){
-            break;
+        if(puntosJugador > 21){
+            console.warn('Perdiste');
+            btnPedir.disabled = true;
+            btnDetener.disabled = true;
+            turnoComputadora(puntosJugador);
+        }else if (puntosJugador === 21){
+            console.warn('Ganaste');
+            btnPedir.disabled = true;
+            btnDetener.disabled = true;
+            turnoComputadora(puntosJugador);
         }
+    });
 
-    } while ((puntosComputadora < puntosMinimos) && (puntosMinimos <= 21));
-
-    setTimeout(() => {
-        if(puntosComputadora === puntosMinimos){
-            alert('Empate 😊')
-        } else if (puntosMinimos > 21) {
-            alert ('Computadora gana 🖥️')
-        }else if (puntosComputadora > 21){
-            alert('Jugadora Gana👌')
-        }else{
-            alert('Computadora gana 🖥️');
-        }
-    },100)
-
-}
-
-
-//Eventos
-btnPedir.addEventListener('click' ,  () => {
-    const carta = pedirCarta();
-    puntosJugador = puntosJugador + valorCarta(carta);
-    puntosHTML[0].innerHTML = puntosJugador;
-
-    const imgCarta = document.createElement('img');
-    imgCarta.src = `assets/cartas/cartas/${carta}.png`;
-    imgCarta.classList.add('carta');
-    divCartasJugador.append(imgCarta);
-
-    if(puntosJugador > 21){
-        console.warn('Perdiste');
+    btnDetener.addEventListener('click' , () => {
         btnPedir.disabled = true;
         btnDetener.disabled = true;
+
         turnoComputadora(puntosJugador);
-    }else if (puntosJugador === 21){
-        console.warn('Ganaste');
-        btnPedir.disabled = true;
-        btnDetener.disabled = true;
-        turnoComputadora(puntosJugador);
-    }
-});
+    })
 
-btnDetener.addEventListener('click' , () => {
-    btnPedir.disabled = true;
-    btnDetener.disabled = true;
+    btnNuevo.addEventListener('click', () => {
 
-    turnoComputadora(puntosJugador);
-})
+        console.clear()
 
-btnNuevo.addEventListener('click', () => {
+        deck = [];
+        deck = crearDeck();
 
-    console.clear()
+        puntosJugador = 0;
+        puntosComputadora = 0;
 
-    deck = [];
-    deck = crearDeck();
+        puntosHTML[0].innerHTML = 0;
+        puntosHTML[1].innerHTML = 0;
 
-    puntosJugador = 0;
-    puntosComputadora = 0;
+        divCartasJugador.innerHTML = "";
+        divCartasComputadora.innerHTML = "";
 
-    puntosHTML[0].innerHTML = 0;
-    puntosHTML[1].innerHTML = 0;
+        btnPedir.disabled = false;
+        btnDetener.disabled = false;
 
-    divCartasJugador.innerHTML = "";
-    divCartasComputadora.innerHTML = "";
+    })
 
-    btnPedir.disabled = false;
-    btnDetener.disabled = false;
+})();
 
-})
 
