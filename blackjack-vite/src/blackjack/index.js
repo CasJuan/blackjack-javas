@@ -1,8 +1,7 @@
 
 import _ from 'underscore';
-import {crearDeck} from './usecases/crear-deck';
-import { pedirCarta } from './usecases/pedir-carta';
 
+import { crearDeck,pedirCarta,valorCarta } from './usecases';
 
 
 const miModulo = (() => {
