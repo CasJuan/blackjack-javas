@@ -1,7 +1,7 @@
 
 import _ from 'underscore';
 
-import { crearDeck,pedirCarta,turnoComputadora,valorCarta } from './usecases';
+import { crearDeck,pedirCarta,turnoComputadora,valorCarta, crearCartaHTML } from './usecases';
 
 
 const miModulo = (() => {
@@ -90,7 +90,8 @@ const miModulo = (() => {
         const carta = pedirCarta(deck);
         const puntosJugador = acumularPuntos( carta, 0 );
         
-        crearCarta( carta, 0 );
+        const imgCarta = crearCartaHTML(carta);
+        divCartasJugador.append(imgCarta);
 
 
         if ( puntosJugador > 21 ) {
